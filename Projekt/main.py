@@ -3,8 +3,10 @@ import mysql_connector as cn
 import log_writer as log
 import log_sstats as st
 import settings
+from pymongo.collection import Collection
+from pymysql.connections import Connection
 
-def doSearchByKeyword(conn, collection) -> None:
+def doSearchByKeyword(conn: Connection, collection: Collection) -> None:
     ''' 
     Поиск по ключевому слову
     return: постраничный список фильмов
@@ -34,7 +36,7 @@ def doSearchByKeyword(conn, collection) -> None:
         print(f"Произошла ошибка при поиске по ключевому слову: {e}")
 
 
-def doSearchByCategory(conn, collection) -> None:
+def doSearchByCategory(conn: Connection, collection: Collection) -> None:
     ''' 
     Поиск по категории и годам выпуска
     return: постраничный список фильмов
@@ -66,7 +68,7 @@ def doSearchByCategory(conn, collection) -> None:
         print(f"Ошибка при поиске по категории: {e}")
 
 # статистика
-def statistik(collection) -> None:
+def statistik(collection: Collection) -> None:
     '''
     Отображает статистику запросов:
     - Топ-5 самых частых ключевых слов
@@ -79,7 +81,7 @@ def statistik(collection) -> None:
     except Exception as e:
         print(f"Ошибка при отображении статистики: {e}")
 
-def menu(conn, collection) -> None:
+def menu(conn: Connection, collection: Collection) -> None:
     '''
     Главное меню приложения. Обрабатывает выбор пользователя
     Возвращает:
@@ -97,7 +99,8 @@ def menu(conn, collection) -> None:
                 print("Неверный выбор, пожалуйста повторите")
     except Exception as e:
         print(f"Критическая ошибка в главном меню: {e}")
-def main():
+
+def main() -> None:
     try:
         conn = cn.connect(settings.DATABASE_MYSQL_W)
         collection = log.collection(settings.DATABASE_MONGO_W) 

@@ -1,11 +1,13 @@
+from typing import Dict, Any, Tuple, List
 import pymysql
+from pymysql.connections import Connection
 
-def connect(config):
+def connect(config: Dict[str, Any]) -> Connection:
     connection = pymysql.connect(**config)
     return connection
 
 #Поиск по названию
-def searchFilmByTitle(connection, search_word: str, page_number: int):
+def searchFilmByTitle(connection: Connection, search_word: str, page_number: int) -> Tuple[List[Tuple[str, str, int, str]], int]:
     with connection.cursor() as cursor:
         offset_value = (page_number - 1) * 10
         # запрос кол-ва фильмов соответствующих типу поиска
@@ -24,7 +26,7 @@ def searchFilmByTitle(connection, search_word: str, page_number: int):
     return (res, rowcount)
 
 #Поиск по категории
-def searchFilmByCategory(connection, search_category: str, min_year: int, max_year: int, page_number: int):
+def searchFilmByCategory(connection: Connection, search_category: str, min_year: int, max_year: int, page_number: int) -> Tuple[List[Tuple[str, str, int, str]], int]:
     with connection.cursor() as cursor:
         offset_value = (page_number - 1) * 10
         query_count = '''select count(*) from film
@@ -43,7 +45,7 @@ def searchFilmByCategory(connection, search_category: str, min_year: int, max_ye
     return (res, rowcount)
 
 # Список категорий
-def getCategoriesWithYears(connection):
+def getCategoriesWithYears(connection: Connection) -> List[Tuple[str, int, int]]:
     with connection.cursor() as cursor:
         query = '''select c.name, min(f.release_year) as min_year, max(f.release_year) as max_year
         from film f

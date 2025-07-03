@@ -2,7 +2,7 @@ import re
 from typing import List, Tuple, Union
 import formatter as fm
 
-def mainMenu():
+def mainMenu() -> int:
     menu_text = """Введите:
     1 - если поиск по ключевому слову
     2 - если поиск по жанру и диапазону годов выпуска
@@ -22,7 +22,7 @@ def mainMenu():
 # max_page - номер последней доступной страницы
 # Возвращает True для перехода к след. странице или False для прекращения вывода
 
-def showNextResultsPage(res: list, page_number: int, max_page: int) ->bool:
+def showNextResultsPage(res: list, page_number: int, max_page: int) -> bool:
     """
     Показывает текущую страницу с результатами и спрашивает у пользователя, хочет ли он перейти к следующей.
 
@@ -79,7 +79,7 @@ def inputCategory(categories: List[Tuple[str, int, int]]) -> int:
         else:
             print("Неверное значение, попробуйте еще раз.")
 
-def inputYears(range_min: int, range_max: int)-> Tuple[int, int]:
+def inputYears(range_min: int, range_max: int) -> Tuple[int, int]:
     print(f"По выбранной категории доступны годы выпуска с {range_min} по {range_max}")
     while True:
         print("Укажите год или диапазон (например: 2020 или 2010-2020)")

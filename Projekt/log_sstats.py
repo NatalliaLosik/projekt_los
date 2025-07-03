@@ -1,6 +1,9 @@
 from datetime import datetime
+from typing import List, Dict, Any
+from pymongo.collection import Collection
 
-def getFrequencyTop5(collection):
+
+def getFrequencyTop5(collection: Collection) -> List[Dict[str, Any]]:
     query_frequency5 = [
         {
             "$group": {
@@ -31,7 +34,7 @@ def getFrequencyTop5(collection):
         }]
     return results
 
-def getLatestTop5(collection):
+def getLatestTop5(collection: Collection) -> List[Dict[str, Any]]:
     query_last5 = [
         {
             "$project": {

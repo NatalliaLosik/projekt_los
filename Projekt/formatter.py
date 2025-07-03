@@ -1,7 +1,7 @@
 from prettytable import PrettyTable, HRuleStyle
 from prettytable.colortable import ColorTable, Themes
 from datetime import datetime
-from typing import List, Tuple
+from typing import List, Tuple, Dict, Any
 
 
 
@@ -42,7 +42,7 @@ def printTableFilms(results: List[Tuple[str, str, int, float]]) -> None:
     except Exception as e:
         print(f"Ошибка при выводе таблицы фильмов: {e}")
 
-def printStatistikCount(results_frequency5):
+def printStatistikCount(results_frequency5: List[Dict[str, Any]]) -> None:
     table = PrettyTable()
     table.field_names = ["#", "Type", "Query", "Count"]
     table.align["Query"] = "l"
@@ -57,7 +57,7 @@ def printStatistikCount(results_frequency5):
 
     print(table)
 
-def printStatistikLatest(results_last):
+def printStatistikLatest(results_last: List[Dict[str, Any]]) -> None:
     table = PrettyTable()
     table.field_names = ["#", "Type", "Query", "DateTime"]
     table.align["Query"] = "l"

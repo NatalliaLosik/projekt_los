@@ -2,8 +2,9 @@ from pymongo import MongoClient
 from pymongo.collection import Collection
 from datetime import datetime
 from urllib.parse import quote_plus
+from typing import Dict
 
-def collection(config) -> Collection:
+def collection(config: Dict[str, str]) -> Collection:
     args = '&'.join([config["args"], f'authSource={config["authSource"]}']).strip('&')
     uri = "mongodb://%s:%s@%s/?%s" % (
         quote_plus(config["user"]),
@@ -15,7 +16,7 @@ def collection(config) -> Collection:
     collection = db['final_project_100125_Losik']
     return collection
 
-def logRequestKeyword(collection, search_word: str, res_count: int):
+def logRequestKeyword(collection: Collection, search_word: str, res_count: int):
     search_type = "keyword"
     params = {"keyword": search_word}    
     log = {
@@ -26,7 +27,7 @@ def logRequestKeyword(collection, search_word: str, res_count: int):
     }
     collection.insert_one(log)
 
-def logRequestCategory(collection, search_category: str, min_year: int, max_year: int, res_count: int):   
+def logRequestCategory(collection: Collection, search_category: str, min_year: int, max_year: int, res_count: int):   
     search_type = "category"
     params = {
         "category": search_category,
