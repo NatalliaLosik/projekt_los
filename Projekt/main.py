@@ -2,9 +2,9 @@ import ui
 import mysql_connector as cn
 import log_writer as log
 import log_sstats as st
-import formatter as fm
+import settings
 
-def doSearchByKeyword(conn) -> None:
+def doSearchByKeyword(conn, collection) -> None:
     ''' 
     Поиск по ключевому слову
     return: постраничный список фильмов
@@ -15,10 +15,15 @@ def doSearchByKeyword(conn) -> None:
     
         res = cn.searchFilmByTitle(conn, search_word, page_number)
         if res:
-            rescount = res[1]
+            films, rescount = res
             max_page = (rescount - 1) // 10 + 1
-            log.log_request_keyword(search_word, rescount)
-            print(f'Найдено фильмов: {rescount} на {max_page} страницах')
+
+            try:
+                log.logRequestKeyword(collection, search_word, rescount)
+            except Exception as log_error:
+                print(f"Ошибка логгирования запроса: {log_error}")
+
+            print(f'Найдено фильмов: {rescount}') #на {max_page} страницах')
 
             while ui.showNextResultsPage(res[0], page_number, max_page):
                 page_number += 1
@@ -29,7 +34,11 @@ def doSearchByKeyword(conn) -> None:
         print(f"Произошла ошибка при поиске по ключевому слову: {e}")
 
 
-def doSearchByCategory(conn) -> None:
+def doSearchByCategory(conn, collection) -> None:
+    ''' 
+    Поиск по категории и годам выпуска
+    return: постраничный список фильмов
+    '''
     try:
         categories = cn.getCategoriesWithYears(conn)
         if (category_num := ui.inputCategory(categories)) == 0:
@@ -46,9 +55,9 @@ def doSearchByCategory(conn) -> None:
         if res:
             rescount = res[1]
             max_page = (rescount - 1) // 10 + 1
-            log.log_request_category(search_category, min_year, max_year, rescount)
+            log.logRequestCategory(collection, search_category, min_year, max_year, rescount)
             print(f'Найдено фильмов: {rescount} на {max_page} страницах')
-            while ui.printNextResultsPage(res[0], page_number, max_page):
+            while ui.showNextResultsPage(res[0], page_number, max_page):
                 page_number += 1
                 res = cn.searchFilmByCategory(conn, search_category, min_year, max_year, page_number)
         else:
@@ -57,30 +66,42 @@ def doSearchByCategory(conn) -> None:
         print(f"Ошибка при поиске по категории: {e}")
 
 # статистика
-def statistik():
-    results_frequency5 = st.getFrequencyTop5()
-    print("\nТоп-5 по частоте:")
-    fm.print_statistik_count(results_frequency5)
+def statistik(collection) -> None:
+    '''
+    Отображает статистику запросов:
+    - Топ-5 самых частых ключевых слов
+    - Топ-5 последних ключевых слов
+    '''
+    try:
+        results_frequency5 = st.getFrequencyTop5(collection)
+        results_last = st.getLatestTop5(collection)
+        ui.showStatistik(results_frequency5, results_last)
+    except Exception as e:
+        print(f"Ошибка при отображении статистики: {e}")
 
-    results_last = st.getLatestTop5()
-    print("\nТоп-5 по последним поискам:")
-    fm.print_statistik_latest(results_last)
-
-def menu(conn):
-    while (search_type := ui.main_menu()) != 0:    
-        if search_type == 1:
-            doSearchByKeyword(conn)
-        elif search_type == 2:
-            doSearchByCategory(conn)
-        elif search_type == 3:
-            statistik()
-        else:
-            print("Неверный выбор, пожалуйста повторите")
-
+def menu(conn, collection) -> None:
+    '''
+    Главное меню приложения. Обрабатывает выбор пользователя
+    Возвращает:
+    - None
+    '''
+    try:
+        while (search_type := ui.mainMenu()) != 0:    
+            if search_type == 1:
+                doSearchByKeyword(conn, collection)
+            elif search_type == 2:
+                doSearchByCategory(conn, collection)
+            elif search_type == 3:
+                statistik(collection)
+            else:
+                print("Неверный выбор, пожалуйста повторите")
+    except Exception as e:
+        print(f"Критическая ошибка в главном меню: {e}")
 def main():
     try:
-        conn = cn.connect()
-        menu(conn)
+        conn = cn.connect(settings.DATABASE_MYSQL_W)
+        collection = log.collection(settings.DATABASE_MONGO_W) 
+        menu(conn, collection)
         conn.close()
     except Exception as error:
         print('Произошла ошибка. ', error)

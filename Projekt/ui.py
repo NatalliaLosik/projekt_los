@@ -2,7 +2,7 @@ import re
 from typing import List, Tuple, Union
 import formatter as fm
 
-def main_menu():
+def mainMenu():
     menu_text = """Введите:
     1 - если поиск по ключевому слову
     2 - если поиск по жанру и диапазону годов выпуска
@@ -21,9 +21,23 @@ def main_menu():
 # page_number - отображаемая страница
 # max_page - номер последней доступной страницы
 # Возвращает True для перехода к след. странице или False для прекращения вывода
-def showNextResultsPage(res, page_number, max_page):
-    print(f"\n--- Страница {page_number} ---")
-    fm.print_table_films(res)
+
+def showNextResultsPage(res: list, page_number: int, max_page: int) ->bool:
+    """
+    Показывает текущую страницу с результатами и спрашивает у пользователя, хочет ли он перейти к следующей.
+
+    Аргументы:
+    - res (list): Список фильмов или результатов, которые нужно отобразить на текущей странице.
+    - page_number (int): Номер текущей страницы.
+    - max_page (int): Общее количество доступных страниц.
+
+    Возвращает:
+    - bool: True, если пользователь хочет перейти к следующей странице, иначе False.
+    """
+    if not res:
+        return False
+    print(f"\n--- Страница {page_number} из {max_page} ---")
+    fm.printTableFilms(res)
 
     if page_number >= max_page:
         print("Вы достигли последней страницы.")
@@ -68,7 +82,11 @@ def inputCategory(categories: List[Tuple[str, int, int]]) -> int:
 def inputYears(range_min: int, range_max: int)-> Tuple[int, int]:
     print(f"По выбранной категории доступны годы выпуска с {range_min} по {range_max}")
     while True:
-        year_input = input("Введите год или диапазон (например: 2020 или 2010-2020): ").strip()
+        print("Укажите год или диапазон (например: 2020 или 2010-2020)")
+        print("ENTER - выбрать весь доступный диапазон")
+        year_input = input("Ваш выбор: ").strip()
+        if not year_input:
+            year_input = f'{range_min}-{range_max}'
         # Ищем двух- или однозначные года
         years = re.findall(r'\d{4}', year_input)
         try:
@@ -83,7 +101,36 @@ def inputYears(range_min: int, range_max: int)-> Tuple[int, int]:
                 raise ValueError
             if min_year < range_min or max_year > range_max:
                 raise ValueError
+            print(f'Вы выбрали годы {min_year}-{max_year}')
             return (min_year, max_year)
         except ValueError:
             print("Неверный формат года. Введите год или диапазон, например: 2015 или 2010-2020.")
+
+def showStatistik(results_frequency5: list, results_last: list) -> None:
+    """
+    Отображает статистику:
+    - Топ-5 популярных запросов
+    - Топ-5 последних запросов
+    Аргументы:
+    - results_frequency5: список популярных запросов.
+    - results_last: список последних запросов.
+
+    Возвращает:
+    - None
+    """
+    try:
+        print("\nТоп-5 популярных запросов:")
+        if results_frequency5:
+            fm.printStatistikCount(results_frequency5)
+        else:
+            print("Нет данных по популярным запросам.")
+
+        print("\nТоп-5 последних запросов:")
+        if results_last:
+            fm.printStatistikLatest(results_last)
+        else:
+            print("Нет данных по последним запросам.")
+
+    except Exception as e:
+        print(f"Ошибка при отображении статистики: {e}")
 

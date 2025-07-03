@@ -1,12 +1,6 @@
 import pymysql
-config = { 
-'host': 'ich-db.edu.itcareerhub.de',
-'user': 'ich1', 
-'password': 'password', 
-'database': 'sakila'
-}
 
-def connect():
+def connect(config):
     connection = pymysql.connect(**config)
     return connection
 

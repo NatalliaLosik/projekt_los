@@ -1,14 +1,21 @@
 from pymongo import MongoClient
+from pymongo.collection import Collection
 from datetime import datetime
+from urllib.parse import quote_plus
 
-client = MongoClient(
-    "mongodb://ich_editor:verystrongpassword"
-    "@mongo.itcareerhub.de/?readPreference=primary"
-    "&ssl=false&authMechanism=DEFAULT&authSource=ich_edit")
-db = client["ich_edit"]
-collection = db['final_project_100125_Losik']
+def collection(config) -> Collection:
+    args = '&'.join([config["args"], f'authSource={config["authSource"]}']).strip('&')
+    uri = "mongodb://%s:%s@%s/?%s" % (
+        quote_plus(config["user"]),
+        quote_plus(config["password"]),
+        config["host"],
+        args)
+    client = MongoClient(uri)
+    db = client[config["db"]]
+    collection = db['final_project_100125_Losik']
+    return collection
 
-def log_request_keyword(search_word: str, res_count: int):
+def logRequestKeyword(collection, search_word: str, res_count: int):
     search_type = "keyword"
     params = {"keyword": search_word}    
     log = {
@@ -19,7 +26,7 @@ def log_request_keyword(search_word: str, res_count: int):
     }
     collection.insert_one(log)
 
-def log_request_category(search_category: str, min_year: int, max_year: int, res_count: int):   
+def logRequestCategory(collection, search_category: str, min_year: int, max_year: int, res_count: int):   
     search_type = "category"
     params = {
         "category": search_category,

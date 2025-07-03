@@ -1,23 +1,48 @@
 from prettytable import PrettyTable, HRuleStyle
 from prettytable.colortable import ColorTable, Themes
 from datetime import datetime
+from typing import List, Tuple
 
-def print_table_films(results):
-    table = ColorTable(theme=Themes.OCEAN)
-    table.field_names = ["Title", "Description", "Year", "Rating"]
-    table.align["Title"] = "l"
-    table.align["Description"] = "l"
-    table.align["Year"] = "r"
-    table.align["Rating"] = "r"
-    table.max_width = 80
-    table.hrules = HRuleStyle.ALL
 
-    for res in results:
-        table.add_row([res[0], res[1], res[2], res[3]])
 
-    print(table)
+def printTableFilms(results: List[Tuple[str, str, int, float]]) -> None:
+    """
+    Выводит таблицу с фильмами в формате:
+    Title | Description | Year | Rating
 
-def print_statistik_count(results_frequency5):
+    Аргументы:
+    - results: список кортежей, содержащих информацию о фильмах:
+        (название, описание, год, рейтинг)
+
+    Возвращает:
+    - None
+    """
+    try:
+        if not results:
+            print("Нет фильмов для отображения.")
+            return
+
+        table = ColorTable(theme=Themes.OCEAN)
+        table.field_names = ["Title", "Description", "Year", "Rating"]
+        table.align["Title"] = "l"
+        table.align["Description"] = "l"
+        table.align["Year"] = "r"
+        table.align["Rating"] = "r"
+        table.max_width = 80
+        table.hrules = HRuleStyle.ALL
+
+        for res in results:
+            if len(res) < 4:
+                print(f"Некорректные данные: {res}")
+                continue
+            table.add_row([res[0], res[1], res[2], res[3]])
+
+        print(table)
+
+    except Exception as e:
+        print(f"Ошибка при выводе таблицы фильмов: {e}")
+
+def printStatistikCount(results_frequency5):
     table = PrettyTable()
     table.field_names = ["#", "Type", "Query", "Count"]
     table.align["Query"] = "l"
@@ -32,7 +57,7 @@ def print_statistik_count(results_frequency5):
 
     print(table)
 
-def print_statistik_latest(results_last):
+def printStatistikLatest(results_last):
     table = PrettyTable()
     table.field_names = ["#", "Type", "Query", "DateTime"]
     table.align["Query"] = "l"

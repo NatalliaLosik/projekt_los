@@ -1,14 +1,6 @@
-from pymongo import MongoClient
 from datetime import datetime
 
-client = MongoClient(
-    "mongodb://ich_editor:verystrongpassword"
-    "@mongo.itcareerhub.de/?readPreference=primary"
-    "&ssl=false&authMechanism=DEFAULT&authSource=ich_edit")
-db = client["ich_edit"]
-collection = db['final_project_100125_Losik']
-
-def getFrequencyTop5():
+def getFrequencyTop5(collection):
     query_frequency5 = [
         {
             "$group": {
@@ -39,7 +31,7 @@ def getFrequencyTop5():
         }]
     return results
 
-def getLatestTop5():
+def getLatestTop5(collection):
     query_last5 = [
         {
             "$project": {
